@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.ewm.category.CategoryNotFoundException;
+import ru.practicum.ewm.compilation.CompilationNotFoundException;
+import ru.practicum.ewm.event.EventNotFoundException;
 import ru.practicum.ewm.user.UserNotFoundException;
 
 @RestControllerAdvice("ru.practicum.ewm")
@@ -35,5 +37,23 @@ public class ErrorHandler {
                 .message(e.getMessage())
                 .reason("Валидация не пройдена")
                 .status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    @ExceptionHandler(CompilationNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleCompilationNotFound(final CompilationNotFoundException e){
+        return ApiError.builder()
+                .message(e.getMessage())
+                .reason("Требуемый объект не найден.")
+                .status(HttpStatus.NOT_FOUND).build();
+    }
+
+    @ExceptionHandler(EventNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleCompilationNotFound(final EventNotFoundException e){
+        return ApiError.builder()
+                .message(e.getMessage())
+                .reason("Требуемый объект не найден.")
+                .status(HttpStatus.NOT_FOUND).build();
     }
 }

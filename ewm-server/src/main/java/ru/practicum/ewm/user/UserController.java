@@ -17,7 +17,7 @@ import java.util.List;
 @Validated
 public class UserController {
 
-    public final UserService userService;
+    private final UserService userService;
 
     @PostMapping
     public UserDto createUser(@RequestBody @Valid NewUserRequest userRequest) {
@@ -31,8 +31,8 @@ public class UserController {
 
     @GetMapping
     public List<UserDto> findAllUser(@RequestParam(name = "ids", required = false) Long[] ids,
-            @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-            @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+                                     @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                     @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         return userService.findAllUser(ids, from, size);
     }
 }

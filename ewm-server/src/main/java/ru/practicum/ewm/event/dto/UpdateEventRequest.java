@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class UpdateEventRequest {
     @Size(min = 20, max = 2000)
     private String annotation;
-    private Long categoryId;
+    private Long category;
     @Size(min = 20, max = 7000)
     private String description;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
