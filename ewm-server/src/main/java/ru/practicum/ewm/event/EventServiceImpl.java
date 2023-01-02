@@ -9,6 +9,7 @@ import ru.practicum.ewm.category.CategoryRepository;
 import ru.practicum.ewm.error.ValidationException;
 import ru.practicum.ewm.event.dto.AdminUpdateEventRequest;
 import ru.practicum.ewm.event.dto.EventFullDto;
+import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
 import ru.practicum.ewm.user.User;
 import ru.practicum.ewm.user.UserNotFoundException;
@@ -63,7 +64,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventFullDto> findAllByAdmin(Long[] users, String[] states, Long[] categories,
                                              String rangeStart, String rangeEnd, Integer from, Integer size) {
-        List<Event> events = eventRepository.findAll(PageRequest.of(((from) / size), size)).toList();
+        List<Event> events = eventRepository.findAll();
         if (users != null) {
             List<Long> usersId = Arrays.asList(users);
             events = events.stream()
@@ -91,6 +92,7 @@ public class EventServiceImpl implements EventService {
             events = events.stream()
                     .filter(event -> dateEnd.isAfter(event.getEventDate())).collect(Collectors.toList());
         }
+        events = events.stream().skip(from).limit(size).collect(Collectors.toList());
         return events.stream().map(EventMapper::toEventFullDto).collect(Collectors.toList());
     }
 
@@ -161,5 +163,12 @@ public class EventServiceImpl implements EventService {
         }
         event.setState(State.CANCELED);
         return EventMapper.toEventFullDto(eventRepository.save(event));
+    }
+
+    @Override
+    public List<EventShortDto> findAllEventByPublicApi(String text, Long[] categories, Boolean paid, String rangeStart,
+                                                       String rangeEnd, boolean onlyAvailable, String sort,
+                                                       Integer from, Integer size) {
+        return null;
     }
 }

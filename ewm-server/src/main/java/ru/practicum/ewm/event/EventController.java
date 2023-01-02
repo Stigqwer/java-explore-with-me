@@ -5,6 +5,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.dto.AdminUpdateEventRequest;
 import ru.practicum.ewm.event.dto.EventFullDto;
+import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
 
 import javax.validation.Valid;
@@ -39,17 +40,32 @@ public class EventController {
 
     @PutMapping("admin/events/{eventId}")
     public EventFullDto updateEventByAdmin(@RequestBody AdminUpdateEventRequest eventRequest,
-                                           @PathVariable Long eventId){
+                                           @PathVariable Long eventId) {
         return eventService.updateEventByAdmin(eventRequest, eventId);
     }
 
     @PatchMapping("admin/events/{eventId}/publish")
-    public EventFullDto publishEvent(@PathVariable Long eventId){
+    public EventFullDto publishEvent(@PathVariable Long eventId) {
         return eventService.publishEvent(eventId);
     }
 
     @PatchMapping("admin/events/{eventId}/reject")
-    public EventFullDto rejectEvent(@PathVariable Long eventId){
+    public EventFullDto rejectEvent(@PathVariable Long eventId) {
         return eventService.rejectEvent(eventId);
+    }
+
+    @GetMapping("/events")
+    public List<EventShortDto> findAllEventByPublicApi(
+            @RequestParam(name = "text", required = false) String text,
+            @RequestParam(name = "categories", required = false) Long[] categories,
+            @RequestParam(name = "paid", required = false) Boolean paid,
+            @RequestParam(name = "rangeStart", required = false) String rangeStart,
+            @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
+            @RequestParam(name = "onlyAvailable", defaultValue = "false") boolean onlyAvailable,
+            @RequestParam(name = "sort") String sort,
+            @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+            @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        return eventService.findAllEventByPublicApi(text, categories, paid, rangeStart, rangeEnd,
+                onlyAvailable, sort, from, size);
     }
 }
