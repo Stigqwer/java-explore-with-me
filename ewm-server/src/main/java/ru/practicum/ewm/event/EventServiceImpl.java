@@ -1,7 +1,6 @@
 package ru.practicum.ewm.event;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.category.Category;
 import ru.practicum.ewm.category.CategoryNotFoundException;
@@ -18,6 +17,7 @@ import ru.practicum.ewm.user.UserRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -80,6 +80,12 @@ public class EventServiceImpl implements EventService {
             events = events.stream()
                     .filter(event -> categoriesId.contains(event.getCategory().getId())).collect(Collectors.toList());
         }
+        events = filterEventByDate(rangeStart, rangeEnd, events);
+        events = events.stream().skip(from).limit(size).collect(Collectors.toList());
+        return events.stream().map(EventMapper::toEventFullDto).collect(Collectors.toList());
+    }
+
+    private List<Event> filterEventByDate(String rangeStart, String rangeEnd, List<Event> events) {
         if (rangeStart != null) {
             LocalDateTime dateStart =
                     LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -92,8 +98,7 @@ public class EventServiceImpl implements EventService {
             events = events.stream()
                     .filter(event -> dateEnd.isAfter(event.getEventDate())).collect(Collectors.toList());
         }
-        events = events.stream().skip(from).limit(size).collect(Collectors.toList());
-        return events.stream().map(EventMapper::toEventFullDto).collect(Collectors.toList());
+        return events;
     }
 
     @Override
@@ -169,6 +174,43 @@ public class EventServiceImpl implements EventService {
     public List<EventShortDto> findAllEventByPublicApi(String text, Long[] categories, Boolean paid, String rangeStart,
                                                        String rangeEnd, boolean onlyAvailable, String sort,
                                                        Integer from, Integer size) {
-        return null;
+        List<Event> events = eventRepository.findAllByState(State.PUBLISHED);
+        if(text != null){
+            events = events.stream().filter(event -> event.getAnnotation().toLowerCase().contains(text.toLowerCase())
+                    || event.getDescription().toLowerCase().contains(text.toLowerCase())).collect(Collectors.toList());
+        }
+        if (categories != null) {
+            List<Long> categoriesId = Arrays.asList(categories);
+            events = events.stream()
+                    .filter(event -> categoriesId.contains(event.getCategory().getId())).collect(Collectors.toList());
+        }
+        if(paid != null) {
+            events = events.stream().filter(event -> event.isPaid() == paid).collect(Collectors.toList());
+        }
+        if(rangeStart == null && rangeEnd == null) {
+            events = events.stream().filter(event -> event.getEventDate().isAfter(LocalDateTime.now()))
+                    .collect(Collectors.toList());
+        } else {
+            events = filterEventByDate(rangeStart, rangeEnd, events);
+        }
+        if(onlyAvailable){
+            events = events.stream().filter(event -> event.getParticipantLimit() == 0
+                    || event.getParticipantLimit() > event.getConfirmedRequests()).collect(Collectors.toList());
+        }
+        if(sort.equals("VIEWS")){
+            events = events.stream().sorted(Comparator.comparingInt(Event::getViews)).collect(Collectors.toList());
+        } else {
+            events = events.stream().sorted((o1, o2) -> {
+                if(o1.getEventDate().isAfter(o2.getEventDate())){
+                    return 1;
+                } else if (o1.getEventDate().isBefore(o2.getEventDate())){
+                    return -1;
+                } else{
+                    return 0;
+                }
+            }).collect(Collectors.toList());
+        }
+        events = events.stream().skip(from).limit(size).collect(Collectors.toList());
+        return events.stream().map(EventMapper::toEventShortDto).collect(Collectors.toList());
     }
 }
