@@ -81,4 +81,21 @@ public class CompilationServiceImp implements CompilationService {
             return optionalCompilation.get();
         }
     }
+
+    @Override
+    public List<CompilationDto> findAllCompilations(Boolean pinned, Integer from, Integer size) {
+        List<Compilation> compilations = compilationRepository.findAll();
+        if(pinned != null){
+            compilations = compilations.stream()
+                    .filter(compilation -> compilation.isPinned() == pinned).collect(Collectors.toList());
+        }
+        compilations = compilations.stream().skip(from).limit(size).collect(Collectors.toList());
+        return compilations.stream().map(CompilationMapper::toCompilationDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public CompilationDto findCompilation(Long compId) {
+        Compilation compilation = findCompilationById(compId);
+        return CompilationMapper.toCompilationDto(compilation);
+    }
 }

@@ -24,8 +24,8 @@ public class UpdateEventRequest {
     private LocalDateTime eventDate;
     @NotNull
     private Long eventId;
-    private boolean paid;
-    private int participantLimit;
+    private Boolean paid;
+    private Integer participantLimit;
     @Size(min = 3, max = 120)
     private String title;
 }

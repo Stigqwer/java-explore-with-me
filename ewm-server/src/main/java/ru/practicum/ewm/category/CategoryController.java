@@ -44,4 +44,6 @@ public class CategoryController {
     public CategoryDto findCategoryById(@PathVariable long catId){
         return categoryService.findCategoryById(catId);
     }
+
+
 }
