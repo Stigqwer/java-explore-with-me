@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.ewm.category.CategoryNotFoundException;
 import ru.practicum.ewm.compilation.CompilationNotFoundException;
 import ru.practicum.ewm.event.EventNotFoundException;
+import ru.practicum.ewm.request.RequestNotFoundException;
 import ru.practicum.ewm.user.UserNotFoundException;
 
 @RestControllerAdvice("ru.practicum.ewm")
@@ -50,7 +51,16 @@ public class ErrorHandler {
 
     @ExceptionHandler(EventNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiError handleCompilationNotFound(final EventNotFoundException e){
+    public ApiError handleEventNotFound(final EventNotFoundException e){
+        return ApiError.builder()
+                .message(e.getMessage())
+                .reason("Требуемый объект не найден.")
+                .status(HttpStatus.NOT_FOUND).build();
+    }
+
+    @ExceptionHandler(RequestNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleRequestNotFound(final RequestNotFoundException e){
         return ApiError.builder()
                 .message(e.getMessage())
                 .reason("Требуемый объект не найден.")
