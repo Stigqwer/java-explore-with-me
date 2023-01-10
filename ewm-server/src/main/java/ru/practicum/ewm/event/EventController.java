@@ -61,7 +61,7 @@ public class EventController {
             @RequestParam(name = "rangeStart", required = false) String rangeStart,
             @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
             @RequestParam(name = "onlyAvailable", defaultValue = "false") boolean onlyAvailable,
-            @RequestParam(name = "sort") String sort,
+            @RequestParam(name = "sort", required = false) String sort,
             @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
             @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         return eventService.findAllEventByPublicApi(request, text, categories, paid, rangeStart, rangeEnd,

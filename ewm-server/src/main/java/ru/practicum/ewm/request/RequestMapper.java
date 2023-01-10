@@ -10,7 +10,7 @@ public class RequestMapper {
         return Request.builder()
                 .event(event)
                 .user(user)
-                .status(State.PENDING)
+                .status(Status.PENDING)
                 .build();
     }
 

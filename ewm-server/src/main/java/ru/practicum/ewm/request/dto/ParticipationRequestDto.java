@@ -2,7 +2,7 @@ package ru.practicum.ewm.request.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
-import ru.practicum.ewm.event.State;
+import ru.practicum.ewm.request.Status;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -19,5 +19,5 @@ public class ParticipationRequestDto {
     private Long id;
     @NotNull
     private Long requester;
-    private State status;
+    private Status status;
 }

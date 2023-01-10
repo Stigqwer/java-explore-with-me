@@ -3,7 +3,6 @@ package ru.practicum.ewm.request;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import ru.practicum.ewm.event.Event;
-import ru.practicum.ewm.event.State;
 import ru.practicum.ewm.user.User;
 
 import javax.persistence.*;
@@ -15,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "events")
+@Table(name = "requests")
 public class Request {
     @Builder.Default
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -30,5 +29,5 @@ public class Request {
     @JoinColumn(name = "user_id")
     private User user;
     @Enumerated(EnumType.STRING)
-    private State status;
+    private Status status;
 }

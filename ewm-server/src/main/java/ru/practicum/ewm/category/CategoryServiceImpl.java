@@ -1,10 +1,12 @@
 package ru.practicum.ewm.category;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.category.dto.CategoryDto;
 import ru.practicum.ewm.category.dto.NewCategoryDto;
+import ru.practicum.ewm.error.UniqueDataException;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,13 +19,26 @@ public class CategoryServiceImpl implements CategoryService{
     private final CategoryRepository categoryRepository;
     @Override
     public CategoryDto createCategory(NewCategoryDto categoryDto) {
-        return CategoryMapper.toCategoryDto(categoryRepository.save(CategoryMapper.toCategory(categoryDto)));
+        CategoryDto categoryDto1;
+        try {
+            categoryDto1 =
+                    CategoryMapper.toCategoryDto(categoryRepository.save(CategoryMapper.toCategory(categoryDto)));
+        } catch (DataIntegrityViolationException e){
+            throw new UniqueDataException("Категория с таким именем уже существует");
+        }
+        return categoryDto1;
     }
 
     @Override
     public CategoryDto patchCategory(CategoryDto categoryDto) {
+        Category category;
+        try {
+            category = categoryRepository.save(CategoryMapper.toCategoryFromCategoryDto(categoryDto));
+        } catch (DataIntegrityViolationException e){
+            throw new UniqueDataException("Категория с таким именем уже существует");
+        }
         return CategoryMapper
-                .toCategoryDto(categoryRepository.save(CategoryMapper.toCategoryFromCategoryDto(categoryDto)));
+                .toCategoryDto(category);
     }
 
     @Override

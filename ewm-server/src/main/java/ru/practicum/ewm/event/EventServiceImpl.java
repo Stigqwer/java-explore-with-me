@@ -122,12 +122,14 @@ public class EventServiceImpl implements EventService {
         }
         event.setDescription(eventRequest.getDescription());
         event.setEventDate(eventRequest.getEventDate());
-        Location location = eventRequest.getLocation();
-        Optional<Location> optionalLocation = locationRepository.findByLatAndLon(location.getLat(), location.getLon());
-        if (optionalLocation.isEmpty()) {
-            locationRepository.save(location);
+        if(eventRequest.getLocation() != null) {
+            Location location = eventRequest.getLocation();
+            Optional<Location> optionalLocation = locationRepository.findByLatAndLon(location.getLat(), location.getLon());
+            if (optionalLocation.isEmpty()) {
+                locationRepository.save(location);
+            }
+            event.setLocation(location);
         }
-        event.setLocation(location);
         event.setPaid(eventRequest.isPaid());
         event.setParticipantLimit(eventRequest.getParticipantLimit());
         event.setRequestModeration(eventRequest.isRequestModeration());
@@ -196,18 +198,20 @@ public class EventServiceImpl implements EventService {
             events = events.stream().filter(event -> event.getParticipantLimit() == 0
                     || event.getParticipantLimit() > event.getConfirmedRequests()).collect(Collectors.toList());
         }
-        if (sort.equals("VIEWS")) {
-            events = events.stream().sorted(Comparator.comparingInt(Event::getViews)).collect(Collectors.toList());
-        } else {
-            events = events.stream().sorted((o1, o2) -> {
-                if (o1.getEventDate().isAfter(o2.getEventDate())) {
-                    return 1;
-                } else if (o1.getEventDate().isBefore(o2.getEventDate())) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            }).collect(Collectors.toList());
+        if(sort != null) {
+            if (sort.equals("VIEWS")) {
+                events = events.stream().sorted(Comparator.comparingInt(Event::getViews)).collect(Collectors.toList());
+            } else if (sort.equals("EVENT_DATE")) {
+                events = events.stream().sorted((o1, o2) -> {
+                    if (o1.getEventDate().isAfter(o2.getEventDate())) {
+                        return 1;
+                    } else if (o1.getEventDate().isBefore(o2.getEventDate())) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }).collect(Collectors.toList());
+            }
         }
         events = events.stream().skip(from).limit(size).collect(Collectors.toList());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");

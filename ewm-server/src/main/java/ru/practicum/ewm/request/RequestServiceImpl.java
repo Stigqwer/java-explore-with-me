@@ -12,8 +12,6 @@ import ru.practicum.ewm.user.User;
 import ru.practicum.ewm.user.UserNotFoundException;
 import ru.practicum.ewm.user.UserRepository;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -55,7 +53,7 @@ public class RequestServiceImpl implements RequestService {
             event.setConfirmedRequests(event.getConfirmedRequests() + 1);
             eventRepository.save(event);
             Request request = RequestMapper.toRequest(event, user);
-            request.setStatus(State.PUBLISHED);
+            request.setStatus(Status.CONFIRMED);
             return RequestMapper.toRequestDto(requestRepository.save(request));
         }
         return RequestMapper.toRequestDto(requestRepository.save(RequestMapper.toRequest(event, user)));
@@ -89,15 +87,15 @@ public class RequestServiceImpl implements RequestService {
         if (!user.equals(request.getUser())) {
             throw new ValidationException("Заявка не принадлежит данному пользователю");
         }
-        if (request.getStatus() == State.CANCELED) {
+        if (request.getStatus() == Status.REJECTED) {
             throw new ValidationException("Заявка уже отменена");
         }
-        if (request.getStatus() == State.PUBLISHED) {
+        if (request.getStatus() == Status.CONFIRMED) {
             Event event = request.getEvent();
             event.setConfirmedRequests(event.getConfirmedRequests() - 1);
             eventRepository.save(event);
         }
-        request.setStatus(State.CANCELED);
+        request.setStatus(Status.CANCELED);
         return RequestMapper.toRequestDto(requestRepository.save(request));
     }
 
@@ -114,13 +112,11 @@ public class RequestServiceImpl implements RequestService {
             throw new EventNotFoundException(String.format("Событие с id %d не найдено", eventId));
         }
         Event event = optionalEvent.get();
-        Optional<Request> optionalRequest = requestRepository.findByUserAndEvent(user, event);
-        if (optionalRequest.isEmpty()) {
-            return Collections.emptyList();
+        if(!event.getInitiator().equals(user)){
+            throw new ValidationException("Событие не принадлежит текущему пользователю");
         }
-        List<ParticipationRequestDto> requestDtos = new ArrayList<>();
-        requestDtos.add(RequestMapper.toRequestDto(optionalRequest.get()));
-        return requestDtos;
+        return requestRepository.findAllByEvent(event).stream()
+                .map(RequestMapper::toRequestDto).collect(Collectors.toList());
     }
 
     @Override
@@ -136,7 +132,10 @@ public class RequestServiceImpl implements RequestService {
             throw new EventNotFoundException(String.format("Событие с id %d не найдено", eventId));
         }
         Event event = optionalEvent.get();
-        Optional<Request> optionalRequest = requestRepository.findByUserAndEvent(user, event);
+        if(!event.getInitiator().equals(user)){
+            throw new ValidationException("Событие не принадлежит текущему пользователю");
+        }
+        Optional<Request> optionalRequest = requestRepository.findById(reqId);
         if (optionalRequest.isEmpty()) {
             throw new RequestNotFoundException(String.format("Заявка с id %d не найдена", reqId));
         }
@@ -144,7 +143,7 @@ public class RequestServiceImpl implements RequestService {
         if (!user.equals(event.getInitiator())) {
             throw new ValidationException("Пользователь не организатор данного мероприятия");
         }
-        request.setStatus(State.PUBLISHED);
+        request.setStatus(Status.CONFIRMED);
         event.setConfirmedRequests(event.getConfirmedRequests() + 1);
         eventRepository.save(event);
         return RequestMapper.toRequestDto(requestRepository.save(request));
@@ -163,7 +162,10 @@ public class RequestServiceImpl implements RequestService {
             throw new EventNotFoundException(String.format("Событие с id %d не найдено", eventId));
         }
         Event event = optionalEvent.get();
-        Optional<Request> optionalRequest = requestRepository.findByUserAndEvent(user, event);
+        if(!event.getInitiator().equals(user)){
+            throw new ValidationException("Событие не принадлежит текущему пользователю");
+        }
+        Optional<Request> optionalRequest = requestRepository.findById(reqId);
         if (optionalRequest.isEmpty()) {
             throw new RequestNotFoundException(String.format("Заявка с id %d не найдена", reqId));
         }
@@ -171,7 +173,7 @@ public class RequestServiceImpl implements RequestService {
         if (!user.equals(event.getInitiator())) {
             throw new ValidationException("Пользователь не организатор данного мероприятия");
         }
-        request.setStatus(State.CANCELED);
+        request.setStatus(Status.REJECTED);
         return RequestMapper.toRequestDto(requestRepository.save(request));
     }
 }

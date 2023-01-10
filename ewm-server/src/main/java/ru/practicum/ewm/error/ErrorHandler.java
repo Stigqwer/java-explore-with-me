@@ -66,4 +66,13 @@ public class ErrorHandler {
                 .reason("Требуемый объект не найден.")
                 .status(HttpStatus.NOT_FOUND).build();
     }
+
+    @ExceptionHandler(UniqueDataException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleUniqueException(final UniqueDataException e){
+        return ApiError.builder()
+                .message(e.getMessage())
+                .reason("Повторяемые значения имен недопустимы.")
+                .status(HttpStatus.CONFLICT).build();
+    }
 }
