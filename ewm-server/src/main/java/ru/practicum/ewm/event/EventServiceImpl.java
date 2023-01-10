@@ -111,8 +111,8 @@ public class EventServiceImpl implements EventService {
         if (eventRequest.getCategory() != null) {
             Optional<Category> optionalCategory = categoryRepository.findById(eventRequest.getCategory());
             if (optionalCategory.isEmpty()) {
-                throw new CategoryNotFoundException
-                        (String.format("Категории с id %d не найдено", eventRequest.getCategory()));
+                throw new CategoryNotFoundException(
+                        String.format("Категории с id %d не найдено", eventRequest.getCategory()));
             } else {
                 Category category = optionalCategory.get();
                 event.setCategory(category);
@@ -284,8 +284,8 @@ public class EventServiceImpl implements EventService {
         if (request.getCategory() != null) {
             Optional<Category> optionalCategory = categoryRepository.findById(request.getCategory());
             if (optionalCategory.isEmpty()) {
-                throw new CategoryNotFoundException
-                        (String.format("Категории с id %d не найдено", request.getCategory()));
+                throw new CategoryNotFoundException(
+                        String.format("Категории с id %d не найдено", request.getCategory()));
             }
             Category category = optionalCategory.get();
             event.setCategory(category);
