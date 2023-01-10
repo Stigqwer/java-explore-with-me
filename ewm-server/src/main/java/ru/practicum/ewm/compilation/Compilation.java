@@ -5,6 +5,7 @@ import ru.practicum.ewm.event.Event;
 
 import javax.persistence.*;
 import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,8 +18,8 @@ public class Compilation {
     private Long id;
     @ManyToMany
     @JoinTable(name = "compilations_events",
-    joinColumns = @JoinColumn (name = "compilation_id"),
-    inverseJoinColumns = @JoinColumn (name = "event_id"))
+            joinColumns = @JoinColumn(name = "compilation_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id"))
     private List<Event> events;
     private boolean pinned;
     private String title;

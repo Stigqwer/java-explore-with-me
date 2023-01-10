@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface StatsService {
     void createHit(EndpointHit endpointHit);
+
     List<ViewStats> findAllStatsWithDate(String start, String end, String[] uris, boolean unique);
 }

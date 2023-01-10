@@ -10,7 +10,7 @@ import ru.practicum.ewm.user.UserMapper;
 
 public class EventMapper {
 
-    public static Event toEvent(NewEventDto newEventDto, Category category, User user, Location location){
+    public static Event toEvent(NewEventDto newEventDto, Category category, User user, Location location) {
         return Event.builder()
                 .annotation(newEventDto.getAnnotation())
                 .category(category)
@@ -26,7 +26,7 @@ public class EventMapper {
                 .build();
     }
 
-    public static EventFullDto toEventFullDto(Event event){
+    public static EventFullDto toEventFullDto(Event event) {
         EventFullDto eventFullDto = EventFullDto.builder()
                 .annotation(event.getAnnotation())
                 .confirmedRequests(event.getConfirmedRequests())
@@ -45,7 +45,7 @@ public class EventMapper {
                 .views(event.getViews())
                 .build();
         Category category = event.getCategory();
-        if(category != null){
+        if (category != null) {
             eventFullDto.setCategory(CategoryMapper.toCategoryDto(category));
         }
         return eventFullDto;
@@ -63,7 +63,7 @@ public class EventMapper {
                 .views(event.getViews())
                 .build();
         Category category = event.getCategory();
-        if(category != null) {
+        if (category != null) {
             eventShortDto.setCategory(CategoryMapper.toCategoryDto(category));
         }
         return eventShortDto;

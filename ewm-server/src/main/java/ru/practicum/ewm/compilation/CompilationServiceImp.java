@@ -37,25 +37,25 @@ public class CompilationServiceImp implements CompilationService {
 
     @Override
     public void deleteEventFromCompilation(Long compId, Long eventId) {
-            Compilation compilation = findCompilationById(compId);
-            List<Event> events = compilation.getEvents().stream()
-                    .filter(event -> !Objects.equals(event.getId(), eventId)).collect(Collectors.toList());
-            compilation.setEvents(events);
-            compilationRepository.save(compilation);
+        Compilation compilation = findCompilationById(compId);
+        List<Event> events = compilation.getEvents().stream()
+                .filter(event -> !Objects.equals(event.getId(), eventId)).collect(Collectors.toList());
+        compilation.setEvents(events);
+        compilationRepository.save(compilation);
     }
 
     @Override
     public void putEventFromCompilation(Long compId, Long eventId) {
-            Compilation compilation = findCompilationById(compId);
-            Optional<Event> optionalEvent = eventRepository.findById(eventId);
-            if (optionalEvent.isEmpty()) {
-                throw new EventNotFoundException(String.format("Событие с id %d найдено", eventId));
-            }
+        Compilation compilation = findCompilationById(compId);
+        Optional<Event> optionalEvent = eventRepository.findById(eventId);
+        if (optionalEvent.isEmpty()) {
+            throw new EventNotFoundException(String.format("Событие с id %d найдено", eventId));
+        }
 
-            List<Event> events = compilation.getEvents();
-            events.add(optionalEvent.get());
-            compilation.setEvents(events);
-            compilationRepository.save(compilation);
+        List<Event> events = compilation.getEvents();
+        events.add(optionalEvent.get());
+        compilation.setEvents(events);
+        compilationRepository.save(compilation);
 
     }
 
@@ -85,7 +85,7 @@ public class CompilationServiceImp implements CompilationService {
     @Override
     public List<CompilationDto> findAllCompilations(Boolean pinned, Integer from, Integer size) {
         List<Compilation> compilations = compilationRepository.findAll();
-        if(pinned != null){
+        if (pinned != null) {
             compilations = compilations.stream()
                     .filter(compilation -> compilation.isPinned() == pinned).collect(Collectors.toList());
         }

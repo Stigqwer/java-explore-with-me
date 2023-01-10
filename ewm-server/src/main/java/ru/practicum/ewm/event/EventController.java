@@ -77,23 +77,23 @@ public class EventController {
     public List<EventShortDto> findAllEventByUser(
             @PathVariable Long userId,
             @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-            @Positive @RequestParam(name = "size", defaultValue = "10") Integer size){
+            @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         return eventService.findAllEventByUser(userId, from, size);
     }
 
     @PatchMapping("/users/{userId}/events")
     public EventFullDto updateEventByUser(@PathVariable Long userId,
-                                         @RequestBody @Valid UpdateEventRequest request){
+                                          @RequestBody @Valid UpdateEventRequest request) {
         return eventService.updateEventByUser(userId, request);
     }
 
     @GetMapping("/users/{userId}/events/{eventId}")
-    public EventFullDto findEventByUser(@PathVariable Long userId, @PathVariable Long eventId){
+    public EventFullDto findEventByUser(@PathVariable Long userId, @PathVariable Long eventId) {
         return eventService.findEventByUser(userId, eventId);
     }
 
     @PatchMapping("/users/{userId}/events/{eventId}")
-    public EventFullDto canceledEventByUser(@PathVariable Long userId, @PathVariable Long eventId){
+    public EventFullDto canceledEventByUser(@PathVariable Long userId, @PathVariable Long eventId) {
         return eventService.canceledEventByUser(userId, eventId);
     }
 }

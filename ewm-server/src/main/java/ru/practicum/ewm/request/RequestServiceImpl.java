@@ -112,7 +112,7 @@ public class RequestServiceImpl implements RequestService {
             throw new EventNotFoundException(String.format("Событие с id %d не найдено", eventId));
         }
         Event event = optionalEvent.get();
-        if(!event.getInitiator().equals(user)){
+        if (!event.getInitiator().equals(user)) {
             throw new ValidationException("Событие не принадлежит текущему пользователю");
         }
         return requestRepository.findAllByEvent(event).stream()
@@ -132,7 +132,7 @@ public class RequestServiceImpl implements RequestService {
             throw new EventNotFoundException(String.format("Событие с id %d не найдено", eventId));
         }
         Event event = optionalEvent.get();
-        if(!event.getInitiator().equals(user)){
+        if (!event.getInitiator().equals(user)) {
             throw new ValidationException("Событие не принадлежит текущему пользователю");
         }
         Optional<Request> optionalRequest = requestRepository.findById(reqId);
@@ -162,7 +162,7 @@ public class RequestServiceImpl implements RequestService {
             throw new EventNotFoundException(String.format("Событие с id %d не найдено", eventId));
         }
         Event event = optionalEvent.get();
-        if(!event.getInitiator().equals(user)){
+        if (!event.getInitiator().equals(user)) {
             throw new ValidationException("Событие не принадлежит текущему пользователю");
         }
         Optional<Request> optionalRequest = requestRepository.findById(reqId);

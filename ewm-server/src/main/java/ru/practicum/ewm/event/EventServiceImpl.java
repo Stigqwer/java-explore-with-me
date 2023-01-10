@@ -122,7 +122,7 @@ public class EventServiceImpl implements EventService {
         }
         event.setDescription(eventRequest.getDescription());
         event.setEventDate(eventRequest.getEventDate());
-        if(eventRequest.getLocation() != null) {
+        if (eventRequest.getLocation() != null) {
             Location location = eventRequest.getLocation();
             Optional<Location> optionalLocation = locationRepository.findByLatAndLon(location.getLat(), location.getLon());
             if (optionalLocation.isEmpty()) {
@@ -198,7 +198,7 @@ public class EventServiceImpl implements EventService {
             events = events.stream().filter(event -> event.getParticipantLimit() == 0
                     || event.getParticipantLimit() > event.getConfirmedRequests()).collect(Collectors.toList());
         }
-        if(sort != null) {
+        if (sort != null) {
             if (sort.equals("VIEWS")) {
                 events = events.stream().sorted(Comparator.comparingInt(Event::getViews)).collect(Collectors.toList());
             } else if (sort.equals("EVENT_DATE")) {
@@ -225,22 +225,22 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto findEvent(Long id, HttpServletRequest request) {
         Optional<Event> optionalEvent = eventRepository.findById(id);
-        if(optionalEvent.isEmpty()){
+        if (optionalEvent.isEmpty()) {
             throw new EventNotFoundException(String.format("Событие с id %d не найдено", id));
         }
         Event event = optionalEvent.get();
-        if(!event.getState().equals(State.PUBLISHED)){
+        if (!event.getState().equals(State.PUBLISHED)) {
             throw new ValidationException("Событие еще не опубликовано");
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime start = LocalDateTime.of(2020,5,5,0,0);
-        LocalDateTime end = LocalDateTime.of(2035,5,5,0,0);
+        LocalDateTime start = LocalDateTime.of(2020, 5, 5, 0, 0);
+        LocalDateTime end = LocalDateTime.of(2035, 5, 5, 0, 0);
         LocalDateTime timeNow = LocalDateTime.now();
         String[] uris = new String[1];
         uris[0] = request.getRequestURI();
         ResponseEntity<Object> responseEntity = eventClient.getStats(start.format(formatter),
                 end.format(formatter), uris);
-        List<LinkedHashMap<String,Object>> list = (List<LinkedHashMap<String, Object>>) responseEntity.getBody();
+        List<LinkedHashMap<String, Object>> list = (List<LinkedHashMap<String, Object>>) responseEntity.getBody();
         LinkedHashMap<String, Object> linkedHashMap = list.get(0);
         String string = linkedHashMap.get("hits").toString();
         event.setViews(Integer.parseInt(string));
@@ -266,10 +266,10 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto updateEventByUser(Long userId, UpdateEventRequest request) {
         Event event = validateUserAndEvent(userId, request.getEventId());
-        if(event.getState() == State.PUBLISHED){
+        if (event.getState() == State.PUBLISHED) {
             throw new ValidationException("Событие уже опубликовано");
         }
-        if(request.getEventDate() != null){
+        if (request.getEventDate() != null) {
             event.setEventDate(request.getEventDate());
         }
         LocalDateTime minimalDateEvent = LocalDateTime.now().plusHours(2);
@@ -278,28 +278,28 @@ public class EventServiceImpl implements EventService {
             throw new ValidationException("До времени начала события меньше двух часов");
         }
         event.setState(State.PENDING);
-        if(request.getAnnotation() != null) {
+        if (request.getAnnotation() != null) {
             event.setAnnotation(request.getAnnotation());
         }
-        if(request.getCategory() != null){
+        if (request.getCategory() != null) {
             Optional<Category> optionalCategory = categoryRepository.findById(request.getCategory());
-            if(optionalCategory.isEmpty()){
+            if (optionalCategory.isEmpty()) {
                 throw new CategoryNotFoundException
                         (String.format("Категории с id %d не найдено", request.getCategory()));
             }
             Category category = optionalCategory.get();
             event.setCategory(category);
         }
-        if(request.getDescription() != null){
+        if (request.getDescription() != null) {
             event.setDescription(request.getDescription());
         }
-        if(request.getPaid() != null){
+        if (request.getPaid() != null) {
             event.setPaid(request.getPaid());
         }
-        if(request.getParticipantLimit() != null) {
+        if (request.getParticipantLimit() != null) {
             event.setParticipantLimit(request.getParticipantLimit());
         }
-        if(request.getTitle() != null){
+        if (request.getTitle() != null) {
             event.setTitle(request.getTitle());
         }
         return EventMapper.toEventFullDto(eventRepository.save(event));
@@ -314,14 +314,14 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto canceledEventByUser(Long userId, Long eventId) {
         Event event = validateUserAndEvent(userId, eventId);
-        if(event.getState() == State.PUBLISHED){
+        if (event.getState() == State.PUBLISHED) {
             throw new ValidationException("Событие уже опубликовано");
         }
         event.setState(State.CANCELED);
         return EventMapper.toEventFullDto(eventRepository.save(event));
     }
 
-    private Event validateUserAndEvent(Long userId, Long eventId){
+    private Event validateUserAndEvent(Long userId, Long eventId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException(String.format("Пользователь с id %d не найден",
@@ -329,11 +329,11 @@ public class EventServiceImpl implements EventService {
         }
         User user = optionalUser.get();
         Optional<Event> optionalEvent = eventRepository.findById(eventId);
-        if(optionalEvent.isEmpty()){
+        if (optionalEvent.isEmpty()) {
             throw new EventNotFoundException(String.format("Событие с id %d не найдено", eventId));
         }
         Event event = optionalEvent.get();
-        if(!event.getInitiator().equals(user)){
+        if (!event.getInitiator().equals(user)) {
             throw new ValidationException("Событие не принадлежит текущему поьзователю");
         }
         return event;

@@ -59,7 +59,7 @@ public class CompilationController {
     }
 
     @GetMapping("/compilations/{compId}")
-    public CompilationDto findCompilation(@PathVariable Long compId){
+    public CompilationDto findCompilation(@PathVariable Long compId) {
         return compilationService.findCompilation(compId);
     }
 }

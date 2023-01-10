@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CompilationMapper {
-    public static Compilation toCompilation(NewCompilationDto compilationDto, List<Event> events){
+    public static Compilation toCompilation(NewCompilationDto compilationDto, List<Event> events) {
         Compilation compilation = new Compilation();
         compilation.setEvents(events);
         compilation.setPinned(compilationDto.isPinned());
@@ -17,7 +17,7 @@ public class CompilationMapper {
         return compilation;
     }
 
-    public static CompilationDto toCompilationDto(Compilation compilation){
+    public static CompilationDto toCompilationDto(Compilation compilation) {
         CompilationDto compilationDto = new CompilationDto();
         compilationDto.setId(compilation.getId());
         compilationDto.setEvents(compilation.getEvents().stream()

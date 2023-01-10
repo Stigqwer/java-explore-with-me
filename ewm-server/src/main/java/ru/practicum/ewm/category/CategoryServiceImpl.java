@@ -14,16 +14,17 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class CategoryServiceImpl implements CategoryService{
+public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+
     @Override
     public CategoryDto createCategory(NewCategoryDto categoryDto) {
         CategoryDto categoryDto1;
         try {
             categoryDto1 =
                     CategoryMapper.toCategoryDto(categoryRepository.save(CategoryMapper.toCategory(categoryDto)));
-        } catch (DataIntegrityViolationException e){
+        } catch (DataIntegrityViolationException e) {
             throw new UniqueDataException("Категория с таким именем уже существует");
         }
         return categoryDto1;
@@ -34,7 +35,7 @@ public class CategoryServiceImpl implements CategoryService{
         Category category;
         try {
             category = categoryRepository.save(CategoryMapper.toCategoryFromCategoryDto(categoryDto));
-        } catch (DataIntegrityViolationException e){
+        } catch (DataIntegrityViolationException e) {
             throw new UniqueDataException("Категория с таким именем уже существует");
         }
         return CategoryMapper
@@ -55,9 +56,9 @@ public class CategoryServiceImpl implements CategoryService{
     @Override
     public CategoryDto findCategoryById(long catId) {
         Optional<Category> category = categoryRepository.findById(catId);
-        if(category.isPresent()){
+        if (category.isPresent()) {
             return CategoryMapper.toCategoryDto(category.get());
-        } else{
+        } else {
             throw new CategoryNotFoundException(String.format("Категория с id %d не найдена", catId));
         }
     }

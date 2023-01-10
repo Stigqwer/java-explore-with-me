@@ -26,6 +26,8 @@ public interface EventService {
     List<EventShortDto> findAllEventByUser(Long userId, Integer from, Integer size);
 
     EventFullDto updateEventByUser(Long userId, UpdateEventRequest request);
+
     EventFullDto findEventByUser(Long userId, Long eventId);
+
     EventFullDto canceledEventByUser(Long userId, Long eventId);
 }

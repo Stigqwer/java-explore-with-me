@@ -9,12 +9,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class StatsServiceImpl implements StatsService{
+public class StatsServiceImpl implements StatsService {
     private final StatsRepository statsRepository;
+
     @Override
     public void createHit(EndpointHit endpointHit) {
         statsRepository.save(StatsMapper.toHit(endpointHit));
@@ -27,12 +27,12 @@ public class StatsServiceImpl implements StatsService{
         LocalDateTime dateEnd =
                 LocalDateTime.parse(end, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         List<ViewStats> viewStatsList = new ArrayList<>();
-        for(String uri: uris){
+        for (String uri : uris) {
             List<Hit> hits = statsRepository.findAll();
             ViewStats viewStats = new ViewStats();
             viewStats.setApp("ewm-server");
             viewStats.setUri(uri);
-            if(unique){
+            if (unique) {
                 viewStats.setHits(statsRepository.countDistinctByUriAndTimestampBetween(uri, dateStart, dateEnd) + 1);
             } else {
                 viewStats.setHits(statsRepository.countByUriAndTimestampBetween(uri, dateStart, dateEnd) + 1);

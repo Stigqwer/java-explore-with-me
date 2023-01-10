@@ -15,7 +15,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(CategoryNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiError handleCategoryNotFound(final CategoryNotFoundException e){
+    public ApiError handleCategoryNotFound(final CategoryNotFoundException e) {
         return ApiError.builder()
                 .message(e.getMessage())
                 .reason("Требуемый объект не найден.")
@@ -24,7 +24,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiError handleUserNotFound(final UserNotFoundException e){
+    public ApiError handleUserNotFound(final UserNotFoundException e) {
         return ApiError.builder()
                 .message(e.getMessage())
                 .reason("Требуемый объект не найден.")
@@ -33,7 +33,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleValidation(final ValidationException e){
+    public ApiError handleValidation(final ValidationException e) {
         return ApiError.builder()
                 .message(e.getMessage())
                 .reason("Валидация не пройдена")
@@ -42,7 +42,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(CompilationNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiError handleCompilationNotFound(final CompilationNotFoundException e){
+    public ApiError handleCompilationNotFound(final CompilationNotFoundException e) {
         return ApiError.builder()
                 .message(e.getMessage())
                 .reason("Требуемый объект не найден.")
@@ -51,7 +51,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(EventNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiError handleEventNotFound(final EventNotFoundException e){
+    public ApiError handleEventNotFound(final EventNotFoundException e) {
         return ApiError.builder()
                 .message(e.getMessage())
                 .reason("Требуемый объект не найден.")
@@ -60,7 +60,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(RequestNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiError handleRequestNotFound(final RequestNotFoundException e){
+    public ApiError handleRequestNotFound(final RequestNotFoundException e) {
         return ApiError.builder()
                 .message(e.getMessage())
                 .reason("Требуемый объект не найден.")
@@ -69,7 +69,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(UniqueDataException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError handleUniqueException(final UniqueDataException e){
+    public ApiError handleUniqueException(final UniqueDataException e) {
         return ApiError.builder()
                 .message(e.getMessage())
                 .reason("Повторяемые значения имен недопустимы.")

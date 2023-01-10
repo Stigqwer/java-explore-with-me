@@ -14,16 +14,16 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
     @Override
     public UserDto createUser(NewUserRequest userRequest) {
         UserDto userDto;
-        try{
+        try {
             userDto = UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userRequest)));
-        } catch (DataIntegrityViolationException e){
+        } catch (DataIntegrityViolationException e) {
             throw new UniqueDataException("Пользователь с таким именем или почтой уже существует");
         }
         return userDto;
@@ -37,10 +37,10 @@ public class UserServiceImpl implements UserService{
     @Override
     public List<UserDto> findAllUser(Long[] ids, Integer from, Integer size) {
         List<UserDto> userDtoList;
-        if(ids == null){
+        if (ids == null) {
             userDtoList = userRepository.findAll(PageRequest.of(((from) / size), size))
                     .stream().map(UserMapper::toUserDto).collect(Collectors.toList());
-        } else{
+        } else {
             List<Long> listId = Arrays.asList(ids);
             userDtoList = userRepository.findAll().stream().filter(user -> listId.contains(user.getId()))
                     .map(UserMapper::toUserDto).collect(Collectors.toList());

@@ -12,7 +12,7 @@ import ru.practicum.ewm.stats.EndpointHit;
 import java.util.Map;
 
 @Service
-public class EventClient extends BaseClient{
+public class EventClient extends BaseClient {
 
     @Autowired
     public EventClient(@Value("http://stats-server:9090") String serverUrl, RestTemplateBuilder builder) {
@@ -24,11 +24,11 @@ public class EventClient extends BaseClient{
         );
     }
 
-    public void createHit(EndpointHit endpointHit){
+    public void createHit(EndpointHit endpointHit) {
         post("/hit", endpointHit);
     }
 
-    public ResponseEntity<Object> getStats(String start, String end, String[] uris, boolean unique){
+    public ResponseEntity<Object> getStats(String start, String end, String[] uris, boolean unique) {
         Map<String, Object> parameters = Map.of(
                 "start", start,
                 "end", end,
@@ -38,7 +38,7 @@ public class EventClient extends BaseClient{
         return get("/stats?start={start}&end={end}&uris={uris}&unique={}", null, parameters);
     }
 
-    public ResponseEntity<Object> getStats(String start, String end, String[] uris){
+    public ResponseEntity<Object> getStats(String start, String end, String[] uris) {
         Map<String, Object> parameters = Map.of(
                 "start", start,
                 "end", end,
