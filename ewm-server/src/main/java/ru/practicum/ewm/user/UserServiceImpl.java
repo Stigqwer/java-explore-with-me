@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
                     .stream().map(UserMapper::toUserDto).collect(Collectors.toList());
         } else {
             List<Long> listId = Arrays.asList(ids);
-            userDtoList = userRepository.findAll().stream().filter(user -> listId.contains(user.getId()))
+            userDtoList = userRepository.getUserByIdIsIn(listId).stream()
                     .map(UserMapper::toUserDto).collect(Collectors.toList());
         }
         return userDtoList;

@@ -13,9 +13,10 @@ import java.util.Map;
 
 @Service
 public class EventClient extends BaseClient {
+    private static final String GET_PATH = "/stats?start={start}&end={end}&uris={uris}";
 
     @Autowired
-    public EventClient(@Value("http://stats-server:9090") String serverUrl, RestTemplateBuilder builder) {
+    public EventClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
         super(
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
@@ -28,22 +29,12 @@ public class EventClient extends BaseClient {
         post("/hit", endpointHit);
     }
 
-    public ResponseEntity<Object> getStats(String start, String end, String[] uris, boolean unique) {
-        Map<String, Object> parameters = Map.of(
-                "start", start,
-                "end", end,
-                "uris", uris,
-                "unique", unique
-        );
-        return get("/stats?start={start}&end={end}&uris={uris}&unique={}", null, parameters);
-    }
-
     public ResponseEntity<Object> getStats(String start, String end, String[] uris) {
         Map<String, Object> parameters = Map.of(
                 "start", start,
                 "end", end,
                 "uris", uris
         );
-        return get("/stats?start={start}&end={end}&uris={uris}", null, parameters);
+        return get(GET_PATH, null, parameters);
     }
 }

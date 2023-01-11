@@ -8,6 +8,7 @@ import ru.practicum.ewm.stats.dto.ViewStats;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -26,18 +27,22 @@ public class StatsServiceImpl implements StatsService {
                 LocalDateTime.parse(start, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         LocalDateTime dateEnd =
                 LocalDateTime.parse(end, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        List<String> uriList = Arrays.asList(uris);
+        List<Integer> hits;
+        if (unique) {
+            hits = statsRepository.countDistinctByUriIsInAndTimestampBetween(uriList, dateStart, dateEnd);
+        } else {
+            hits = statsRepository.countByUriIsInAndTimestampBetween(uriList, dateStart, dateEnd);
+        }
         List<ViewStats> viewStatsList = new ArrayList<>();
+        int countList = 0;
         for (String uri : uris) {
-            List<Hit> hits = statsRepository.findAll();
             ViewStats viewStats = new ViewStats();
             viewStats.setApp("ewm-server");
             viewStats.setUri(uri);
-            if (unique) {
-                viewStats.setHits(statsRepository.countDistinctByUriAndTimestampBetween(uri, dateStart, dateEnd) + 1);
-            } else {
-                viewStats.setHits(statsRepository.countByUriAndTimestampBetween(uri, dateStart, dateEnd) + 1);
-            }
+            viewStats.setHits(hits.get(countList) + 1);
             viewStatsList.add(viewStats);
+            countList++;
         }
         return viewStatsList;
     }

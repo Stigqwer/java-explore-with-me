@@ -24,8 +24,7 @@ public class CompilationServiceImp implements CompilationService {
     @Override
     public CompilationDto createCompilation(NewCompilationDto compilationDto) {
         List<Long> eventsId = compilationDto.getEvents();
-        List<Event> events = eventRepository.findAll().stream()
-                .filter(event -> eventsId.contains(event.getId())).collect(Collectors.toList());
+        List<Event> events = eventRepository.getEventByIdIsIn(eventsId);
         return CompilationMapper.toCompilationDto(compilationRepository
                 .save(CompilationMapper.toCompilation(compilationDto, events)));
     }
@@ -38,6 +37,7 @@ public class CompilationServiceImp implements CompilationService {
     @Override
     public void deleteEventFromCompilation(Long compId, Long eventId) {
         Compilation compilation = findCompilationById(compId);
+        //здесь я фильтрую внутреннее поле объекта подборки, а не события вытаскиваю из базы
         List<Event> events = compilation.getEvents().stream()
                 .filter(event -> !Objects.equals(event.getId(), eventId)).collect(Collectors.toList());
         compilation.setEvents(events);
