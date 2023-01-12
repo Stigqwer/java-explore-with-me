@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS rating;
 DROP TABLE IF EXISTS requests;
 DROP TABLE IF EXISTS compilations_events;
 DROP TABLE IF EXISTS compilations;
@@ -76,5 +77,13 @@ CREATE TABLE IF NOT EXISTS requests
     user_id  INTEGER REFERENCES users (id),
     status   VARCHAR(100),
     CONSTRAINT pk_request primary key (id)
+);
+
+CREATE TABLE IF NOT EXISTS rating
+(
+    event_id BIGINT REFERENCES events (id) NOT NULL,
+    user_id BIGINT REFERENCES users(id) NOT NULL,
+    reaction BOOLEAN,
+    CONSTRAINT pk_rating PRIMARY KEY (event_id, user_id)
 );
 
