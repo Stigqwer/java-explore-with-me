@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Service
 public class EventClient extends BaseClient {
-    private static final String GET_PATH = "/stats?start={start}&end={end}&uris={uris}";
+    private static final String PATH = "/stats?start={start}&end={end}&uris={uris}";
 
     @Autowired
     public EventClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
@@ -35,6 +35,6 @@ public class EventClient extends BaseClient {
                 "end", end,
                 "uris", uris
         );
-        return get(GET_PATH, null, parameters);
+        return get(PATH, null, parameters);
     }
 }
