@@ -1,10 +1,7 @@
 package ru.practicum.ewm.rating;
 
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping
@@ -16,5 +13,10 @@ public class RatingController {
     @PostMapping("/users/{userId}/events/{eventId}/like")
     public Rating addLike(@PathVariable Long userId, @PathVariable Long eventId){
         return ratingService.addLike(userId, eventId);
+    }
+
+    @PostMapping("/users/{userId}/events/{eventId}/dislike")
+    public Rating addDisLike(@PathVariable Long userId, @PathVariable Long eventId){
+        return ratingService.addDislike(userId, eventId);
     }
 }

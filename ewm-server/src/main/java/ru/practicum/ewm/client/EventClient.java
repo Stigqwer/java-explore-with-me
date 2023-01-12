@@ -16,7 +16,7 @@ public class EventClient extends BaseClient {
     private static final String PATH = "/stats?start={start}&end={end}&uris={uris}";
 
     @Autowired
-    public EventClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
+    public EventClient(@Value("http://localhost:9090") String serverUrl, RestTemplateBuilder builder) {
         super(
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
