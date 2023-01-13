@@ -202,18 +202,26 @@ public class EventServiceImpl implements EventService {
                     || event.getParticipantLimit() > event.getConfirmedRequests()).collect(Collectors.toList());
         }
         if (sort != null) {
-            if (sort.equals("VIEWS")) {
-                events = events.stream().sorted(Comparator.comparingInt(Event::getViews)).collect(Collectors.toList());
-            } else if (sort.equals("EVENT_DATE")) {
-                events = events.stream().sorted((o1, o2) -> {
-                    if (o1.getEventDate().isAfter(o2.getEventDate())) {
-                        return 1;
-                    } else if (o1.getEventDate().isBefore(o2.getEventDate())) {
-                        return -1;
-                    } else {
-                        return 0;
-                    }
-                }).collect(Collectors.toList());
+            switch (sort) {
+                case "VIEWS":
+                    events = events.stream().sorted((o1, o2) ->
+                        Integer.compare(o2.getViews(), o1.getViews())).collect(Collectors.toList());
+                    break;
+                case "EVENT_DATE":
+                    events = events.stream().sorted((o1, o2) -> {
+                        if (o1.getEventDate().isAfter(o2.getEventDate())) {
+                            return 1;
+                        } else if (o1.getEventDate().isBefore(o2.getEventDate())) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }).collect(Collectors.toList());
+                    break;
+                case "RATING":
+                    events = events.stream().sorted((o1, o2) ->
+                            Integer.compare(o2.getRating(), o1.getRating())).collect(Collectors.toList());
+                    break;
             }
         }
         events = events.stream().skip(from).limit(size).collect(Collectors.toList());
