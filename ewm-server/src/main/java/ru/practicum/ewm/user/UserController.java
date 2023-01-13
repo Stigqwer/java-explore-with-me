@@ -12,7 +12,7 @@ import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
-@RequestMapping()
+@RequestMapping
 @AllArgsConstructor
 @Validated
 public class UserController {
@@ -24,7 +24,7 @@ public class UserController {
         return userService.createUser(userRequest);
     }
 
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("/admin/users/{userId}")
     public void deleteUser(@PathVariable long userId) {
         userService.deleteUser(userId);
     }
