@@ -36,7 +36,7 @@ public class UserController {
         return userService.findAllUser(ids, from, size);
     }
 
-    @GetMapping("users/{userId}/userRating")
+    @GetMapping("/users/{userId}/userRating")
     public List<UserDto> findAllUserWithRating(
             @PathVariable Long userId,
             @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
