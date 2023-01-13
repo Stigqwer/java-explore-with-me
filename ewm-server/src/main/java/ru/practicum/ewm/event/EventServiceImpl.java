@@ -1,6 +1,9 @@
 package ru.practicum.ewm.event;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.category.Category;
@@ -337,5 +340,35 @@ public class EventServiceImpl implements EventService {
             throw new ValidationException("Событие не принадлежит текущему поьзователю");
         }
         return event;
+    }
+
+    @Override
+    public List<EventShortDto> findAllWithRating(Long userId, Integer from, Integer size) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException(String.format("Пользователь с id %d не найден",
+                    userId));
+        }
+        Pageable pageable = PageRequest.of(((from) / size), size, Sort.by("rating").descending());
+        List<Event> events = eventRepository.findAllByState(State.PUBLISHED, pageable).toList();
+        return events.stream().map(EventMapper::toEventShortDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<EventShortDto> findAllEventByInitiator(Long userId, Long initId, Integer from, Integer size) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException(String.format("Пользователь с id %d не найден",
+                    userId));
+        }
+        Optional<User> optionalInitiator = userRepository.findById(initId);
+        if (optionalInitiator.isEmpty()) {
+            throw new UserNotFoundException(String.format("Пользователь с id %d не найден",
+                    initId));
+        }
+        User initiator = optionalInitiator.get();
+        Pageable pageable = PageRequest.of(((from) / size), size, Sort.by("rating").descending());
+        List<Event> events = eventRepository.findAllByInitiator(initiator, pageable).toList();
+        return events.stream().map(EventMapper::toEventShortDto).collect(Collectors.toList());
     }
 }

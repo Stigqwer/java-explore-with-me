@@ -96,4 +96,20 @@ public class EventController {
     public EventFullDto canceledEventByUser(@PathVariable Long userId, @PathVariable Long eventId) {
         return eventService.canceledEventByUser(userId, eventId);
     }
+
+    @GetMapping("/users/{userId}/eventRating")
+    public List<EventShortDto> findAllEventWithRating(
+            @PathVariable Long userId,
+            @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+            @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        return eventService.findAllWithRating(userId, from, size);
+    }
+
+    @GetMapping("/users/{userId}/userEvent/{initId}")
+    public List<EventShortDto> findAllEventByInitiator(
+            @PathVariable Long userId, @PathVariable Long initId,
+            @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+            @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        return eventService.findAllEventByInitiator(userId, initId, from, size);
+    }
 }

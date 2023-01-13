@@ -12,14 +12,14 @@ import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/admin/users")
+@RequestMapping()
 @AllArgsConstructor
 @Validated
 public class UserController {
 
     private final UserService userService;
 
-    @PostMapping
+    @PostMapping("/admin/users")
     public UserDto createUser(@RequestBody @Valid NewUserRequest userRequest) {
         return userService.createUser(userRequest);
     }
@@ -29,10 +29,18 @@ public class UserController {
         userService.deleteUser(userId);
     }
 
-    @GetMapping
+    @GetMapping("/admin/users")
     public List<UserDto> findAllUser(@RequestParam(name = "ids", required = false) Long[] ids,
                                      @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                      @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         return userService.findAllUser(ids, from, size);
+    }
+
+    @GetMapping("users/{userId}/userRating")
+    public List<UserDto> findAllUserWithRating(
+            @PathVariable Long userId,
+            @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+            @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        return userService.findAllUserWithRating(userId, from, size);
     }
 }
