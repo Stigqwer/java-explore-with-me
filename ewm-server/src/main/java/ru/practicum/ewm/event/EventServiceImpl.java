@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.category.Category;
 import ru.practicum.ewm.category.CategoryNotFoundException;
 import ru.practicum.ewm.category.CategoryRepository;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final LocationRepository locationRepository;
@@ -163,50 +165,9 @@ public class EventServiceImpl implements EventService {
                                                        Boolean paid, String rangeStart, String rangeEnd,
                                                        boolean onlyAvailable, String sort, Integer from, Integer size) {
         List<Event> events = eventRepository.findAllByState(State.PUBLISHED);
-        if (text != null) {
-            events = events.stream().filter(event -> event.getAnnotation().toLowerCase().contains(text.toLowerCase())
-                    || event.getDescription().toLowerCase().contains(text.toLowerCase())).collect(Collectors.toList());
-        }
-        if (categories != null) {
-            List<Long> categoriesId = Arrays.asList(categories);
-            events = events.stream()
-                    .filter(event -> categoriesId.contains(event.getCategory().getId())).collect(Collectors.toList());
-        }
-        if (paid != null) {
-            events = events.stream().filter(event -> event.isPaid() == paid).collect(Collectors.toList());
-        }
-        if (rangeStart == null && rangeEnd == null) {
-            events = events.stream().filter(event -> event.getEventDate().isAfter(LocalDateTime.now()))
-                    .collect(Collectors.toList());
-        } else {
-            events = filterEventByDate(rangeStart, rangeEnd, events);
-        }
-        if (onlyAvailable) {
-            events = events.stream().filter(event -> event.getParticipantLimit() == 0
-                    || event.getParticipantLimit() > event.getConfirmedRequests()).collect(Collectors.toList());
-        }
+        events = filterEvents(events, text, categories, paid, rangeStart, rangeEnd, onlyAvailable);
         if (sort != null) {
-            switch (sort) {
-                case "VIEWS":
-                    events = events.stream().sorted((o1, o2) ->
-                        Integer.compare(o2.getViews(), o1.getViews())).collect(Collectors.toList());
-                    break;
-                case "EVENT_DATE":
-                    events = events.stream().sorted((o1, o2) -> {
-                        if (o1.getEventDate().isAfter(o2.getEventDate())) {
-                            return 1;
-                        } else if (o1.getEventDate().isBefore(o2.getEventDate())) {
-                            return -1;
-                        } else {
-                            return 0;
-                        }
-                    }).collect(Collectors.toList());
-                    break;
-                case "RATING":
-                    events = events.stream().sorted((o1, o2) ->
-                            Integer.compare(o2.getRating(), o1.getRating())).collect(Collectors.toList());
-                    break;
-            }
+            events = sortEvents(events, sort);
         }
         events = events.stream().skip(from).limit(size).collect(Collectors.toList());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -364,6 +325,58 @@ public class EventServiceImpl implements EventService {
                     LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             events = events.stream()
                     .filter(event -> dateEnd.isAfter(event.getEventDate())).collect(Collectors.toList());
+        }
+        return events;
+    }
+
+    private List<Event> sortEvents(List<Event> events, String sort) {
+        switch (sort) {
+            case "VIEWS":
+                events = events.stream().sorted((o1, o2) ->
+                        Integer.compare(o2.getViews(), o1.getViews())).collect(Collectors.toList());
+                break;
+            case "EVENT_DATE":
+                events = events.stream().sorted((o1, o2) -> {
+                    if (o1.getEventDate().isAfter(o2.getEventDate())) {
+                        return 1;
+                    } else if (o1.getEventDate().isBefore(o2.getEventDate())) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }).collect(Collectors.toList());
+                break;
+            case "RATING":
+                events = events.stream().sorted((o1, o2) ->
+                        Integer.compare(o2.getRating(), o1.getRating())).collect(Collectors.toList());
+                break;
+        }
+        return events;
+    }
+
+    private List<Event> filterEvents(List<Event> events, String text, Long[] categories,
+                                     Boolean paid, String rangeStart, String rangeEnd, boolean onlyAvailable) {
+        if (text != null) {
+            events = events.stream().filter(event -> event.getAnnotation().toLowerCase().contains(text.toLowerCase())
+                    || event.getDescription().toLowerCase().contains(text.toLowerCase())).collect(Collectors.toList());
+        }
+        if (categories != null) {
+            List<Long> categoriesId = Arrays.asList(categories);
+            events = events.stream()
+                    .filter(event -> categoriesId.contains(event.getCategory().getId())).collect(Collectors.toList());
+        }
+        if (paid != null) {
+            events = events.stream().filter(event -> event.isPaid() == paid).collect(Collectors.toList());
+        }
+        if (rangeStart == null && rangeEnd == null) {
+            events = events.stream().filter(event -> event.getEventDate().isAfter(LocalDateTime.now()))
+                    .collect(Collectors.toList());
+        } else {
+            events = filterEventByDate(rangeStart, rangeEnd, events);
+        }
+        if (onlyAvailable) {
+            events = events.stream().filter(event -> event.getParticipantLimit() == 0
+                    || event.getParticipantLimit() > event.getConfirmedRequests()).collect(Collectors.toList());
         }
         return events;
     }

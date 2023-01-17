@@ -2,6 +2,7 @@ package ru.practicum.ewm.rating;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.error.ValidationException;
 import ru.practicum.ewm.event.Event;
 import ru.practicum.ewm.event.EventNotFoundException;
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class RatingServiceImpl implements RatingService {
 
     private final RatingRepository ratingRepository;
