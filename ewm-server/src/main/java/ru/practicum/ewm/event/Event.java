@@ -51,4 +51,5 @@ public class Event {
     private State state;
     private String title;
     private int views;
+    private int rating;
 }

@@ -3,6 +3,8 @@ package ru.practicum.ewm.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.error.UniqueDataException;
 import ru.practicum.ewm.user.dto.NewUserRequest;
@@ -10,6 +12,7 @@ import ru.practicum.ewm.user.dto.UserDto;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,5 +49,17 @@ public class UserServiceImpl implements UserService {
                     .map(UserMapper::toUserDto).collect(Collectors.toList());
         }
         return userDtoList;
+    }
+
+    @Override
+    public List<UserDto> findAllUserWithRating(Long userId, Integer from, Integer size) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException(String.format("Пользователь с id %d не найден",
+                    userId));
+        }
+        Pageable pageable = PageRequest.of(((from) / size), size, Sort.by("rating").descending());
+        List<User> users = userRepository.findAll(pageable).toList();
+        return users.stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 }
