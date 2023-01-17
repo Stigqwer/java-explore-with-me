@@ -31,7 +31,5 @@ public interface EventService {
 
     EventFullDto canceledEventByUser(Long userId, Long eventId);
 
-    List<EventShortDto> findAllWithRating(Long userId, Integer from, Integer size);
-
     List<EventShortDto> findAllEventByInitiator(Long userId, Long initId, Integer from, Integer size);
 }

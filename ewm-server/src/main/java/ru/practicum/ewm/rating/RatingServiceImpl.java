@@ -11,6 +11,7 @@ import ru.practicum.ewm.user.User;
 import ru.practicum.ewm.user.UserNotFoundException;
 import ru.practicum.ewm.user.UserRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -33,10 +34,6 @@ public class RatingServiceImpl implements RatingService {
             throw new UserNotFoundException(String.format("Пользователь с id %d не найден",
                     userId));
         }
-        User user = optionalUser.get();
-        if (event.getInitiator().equals(user)) {
-            throw new ValidationException("Нельзя ставить реакцию на свое событие");
-        }
         if (!event.getState().equals(State.PUBLISHED)) {
             throw new ValidationException("Событие не опубликовано");
         }
@@ -57,27 +54,12 @@ public class RatingServiceImpl implements RatingService {
             throw new UserNotFoundException(String.format("Пользователь с id %d не найден",
                     userId));
         }
-        User user = optionalUser.get();
-        if (event.getInitiator().equals(user)) {
-            throw new ValidationException("нельзя ставить реакцию на свое событие");
-        }
         if (!event.getState().equals(State.PUBLISHED)) {
             throw new ValidationException("Событие не опубликовано");
         }
         Rating rating = ratingRepository.save(new Rating(new RatingId(eventId, userId), false));
         saveRating(event);
         return rating;
-    }
-
-    private void saveRating(Event event) {
-        int oldRatingEvent = event.getRating();
-        int ratingEvent = ratingRepository.countReactionByEvent(event.getId(), true)
-                - ratingRepository.countReactionByEvent(event.getId(), false);
-        event.setRating(ratingEvent);
-        eventRepository.save(event);
-        User user = event.getInitiator();
-        user.setRating(user.getRating() + ratingEvent - oldRatingEvent);
-        userRepository.save(user);
     }
 
     @Override
@@ -91,5 +73,23 @@ public class RatingServiceImpl implements RatingService {
         ratingRepository.deleteById(ratingId);
         Event event = eventRepository.findById(ratingId.getEventId()).get();
         saveRating(event);
+    }
+
+    private void saveRating(Event event) {
+        int oldRatingEvent = event.getRating();
+        List<Rating> ratings = ratingRepository.findAllByEvent(event.getId());
+        int ratingEvent = 0;
+        for (Rating rating : ratings) {
+            if (rating.isReaction()) {
+                ratingEvent = ratingEvent + 1;
+            } else {
+                ratingEvent = ratingEvent - 1;
+            }
+        }
+        event.setRating(ratingEvent);
+        eventRepository.save(event);
+        User user = event.getInitiator();
+        user.setRating(user.getRating() + ratingEvent - oldRatingEvent);
+        userRepository.save(user);
     }
 }

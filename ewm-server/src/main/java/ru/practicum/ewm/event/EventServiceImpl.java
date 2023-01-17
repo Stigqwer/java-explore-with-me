@@ -87,22 +87,6 @@ public class EventServiceImpl implements EventService {
         return events.stream().map(EventMapper::toEventFullDto).collect(Collectors.toList());
     }
 
-    private List<Event> filterEventByDate(String rangeStart, String rangeEnd, List<Event> events) {
-        if (rangeStart != null) {
-            LocalDateTime dateStart =
-                    LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            events = events.stream()
-                    .filter(event -> dateStart.isBefore(event.getEventDate())).collect(Collectors.toList());
-        }
-        if (rangeEnd != null) {
-            LocalDateTime dateEnd =
-                    LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            events = events.stream()
-                    .filter(event -> dateEnd.isAfter(event.getEventDate())).collect(Collectors.toList());
-        }
-        return events;
-    }
-
     @Override
     public EventFullDto updateEventByAdmin(AdminUpdateEventRequest eventRequest, Long eventId) {
         Optional<Event> optionalEvent = eventRepository.findById(eventId);
@@ -332,6 +316,24 @@ public class EventServiceImpl implements EventService {
         return EventMapper.toEventFullDto(eventRepository.save(event));
     }
 
+    @Override
+    public List<EventShortDto> findAllEventByInitiator(Long userId, Long initId, Integer from, Integer size) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException(String.format("Пользователь с id %d не найден",
+                    userId));
+        }
+        Optional<User> optionalInitiator = userRepository.findById(initId);
+        if (optionalInitiator.isEmpty()) {
+            throw new UserNotFoundException(String.format("Пользователь с id %d не найден",
+                    initId));
+        }
+        User initiator = optionalInitiator.get();
+        Pageable pageable = PageRequest.of(((from) / size), size, Sort.by("rating").descending());
+        List<Event> events = eventRepository.findAllByInitiator(initiator, pageable).toList();
+        return events.stream().map(EventMapper::toEventShortDto).collect(Collectors.toList());
+    }
+
     private Event validateUserAndEvent(Long userId, Long eventId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isEmpty()) {
@@ -350,33 +352,19 @@ public class EventServiceImpl implements EventService {
         return event;
     }
 
-    @Override
-    public List<EventShortDto> findAllWithRating(Long userId, Integer from, Integer size) {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        if (optionalUser.isEmpty()) {
-            throw new UserNotFoundException(String.format("Пользователь с id %d не найден",
-                    userId));
+    private List<Event> filterEventByDate(String rangeStart, String rangeEnd, List<Event> events) {
+        if (rangeStart != null) {
+            LocalDateTime dateStart =
+                    LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            events = events.stream()
+                    .filter(event -> dateStart.isBefore(event.getEventDate())).collect(Collectors.toList());
         }
-        Pageable pageable = PageRequest.of(((from) / size), size, Sort.by("rating").descending());
-        List<Event> events = eventRepository.findAllByState(State.PUBLISHED, pageable).toList();
-        return events.stream().map(EventMapper::toEventShortDto).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<EventShortDto> findAllEventByInitiator(Long userId, Long initId, Integer from, Integer size) {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        if (optionalUser.isEmpty()) {
-            throw new UserNotFoundException(String.format("Пользователь с id %d не найден",
-                    userId));
+        if (rangeEnd != null) {
+            LocalDateTime dateEnd =
+                    LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            events = events.stream()
+                    .filter(event -> dateEnd.isAfter(event.getEventDate())).collect(Collectors.toList());
         }
-        Optional<User> optionalInitiator = userRepository.findById(initId);
-        if (optionalInitiator.isEmpty()) {
-            throw new UserNotFoundException(String.format("Пользователь с id %d не найден",
-                    initId));
-        }
-        User initiator = optionalInitiator.get();
-        Pageable pageable = PageRequest.of(((from) / size), size, Sort.by("rating").descending());
-        List<Event> events = eventRepository.findAllByInitiator(initiator, pageable).toList();
-        return events.stream().map(EventMapper::toEventShortDto).collect(Collectors.toList());
+        return events;
     }
 }

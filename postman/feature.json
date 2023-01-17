@@ -145,39 +145,6 @@
 			"response": []
 		},
 		{
-			"name": "Рейтинг событий",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {\r",
-							"    pm.expect(pm.response.code).to.be.oneOf([200,201]);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "localhost:8080/users/1/eventRating",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"users",
-						"1",
-						"eventRating"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "События другого пользователя с рейтингом",
 			"event": [
 				{
